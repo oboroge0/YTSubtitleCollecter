@@ -32,8 +32,8 @@ winget install yt-dlp
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/yourusername/yt-subtitle-collecter.git
-cd yt-subtitle-collecter
+git clone https://github.com/oboroge0/YTSubtitleCollecter.git
+cd YTSubtitleCollecter
 
 # 依存関係をインストール
 npm install
