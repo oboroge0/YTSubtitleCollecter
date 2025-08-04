@@ -35,7 +35,11 @@ export class YtDlpWrapper {
     return new Promise((resolve, reject) => {
       const args = ['--dump-json', '--no-warnings', '--no-playlist', url];
 
-      const ytdlp = spawn(this.ytDlpPath, args);
+      // Use shell option on Windows to handle Unicode properly
+      const isWindows = process.platform === 'win32';
+      const spawnOptions = isWindows ? { shell: true, windowsVerbatimArguments: true } : {};
+      
+      const ytdlp = spawn(this.ytDlpPath, args, spawnOptions);
       let stdout = '';
       let stderr = '';
 
@@ -95,7 +99,11 @@ export class YtDlpWrapper {
 
       console.log(`[DEBUG] Running: yt-dlp ${args.join(' ')}`);
 
-      const ytdlp = spawn(this.ytDlpPath, args);
+      // Use shell option on Windows to handle Unicode properly
+      const isWindows = process.platform === 'win32';
+      const spawnOptions = isWindows ? { shell: true, windowsVerbatimArguments: true } : {};
+      
+      const ytdlp = spawn(this.ytDlpPath, args, spawnOptions);
       let stdout = '';
       let stderr = '';
 

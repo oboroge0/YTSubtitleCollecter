@@ -27,7 +27,31 @@ export class SubtitleDownloader {
   }
 
   private sanitizeFilename(filename: string): string {
-    return filename.replace(/[<>:"/\\|?*]/g, '_').substring(0, 200);
+    // Windows-safe filename sanitization
+    return filename
+      .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_') // Windows forbidden characters
+      .replace(/[\u{1F600}-\u{1F64F}]/gu, '_') // Emoji
+      .replace(/[\u{1F300}-\u{1F5FF}]/gu, '_') // Symbols & Pictographs
+      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '_') // Transport & Map
+      .replace(/[\u{1F700}-\u{1F77F}]/gu, '_') // Alchemical Symbols
+      .replace(/[\u{1F780}-\u{1F7FF}]/gu, '_') // Geometric Shapes Extended
+      .replace(/[\u{1F800}-\u{1F8FF}]/gu, '_') // Supplemental Arrows-C
+      .replace(/[\u{2600}-\u{26FF}]/gu, '_')   // Misc symbols
+      .replace(/[\u{2700}-\u{27BF}]/gu, '_')   // Dingbats
+      .replace(/[\u{FE00}-\u{FE0F}]/gu, '')    // Variation selectors
+      .replace(/[\u{1F900}-\u{1F9FF}]/gu, '_') // Supplemental Symbols and Pictographs
+      .replace(/[\u{1FA00}-\u{1FA6F}]/gu, '_') // Chess Symbols
+      .replace(/[\u{1FA70}-\u{1FAFF}]/gu, '_') // Symbols and Pictographs Extended-A
+      .replace(/【/g, '[')                      // Replace Japanese brackets
+      .replace(/】/g, ']')
+      .replace(/「/g, '[')
+      .replace(/」/g, ']')
+      .replace(/『/g, '[')
+      .replace(/』/g, ']')
+      .replace(/\s+/g, '_')                     // Replace spaces with underscore
+      .replace(/_{2,}/g, '_')                   // Remove multiple underscores
+      .replace(/^_+|_+$/g, '')                  // Trim underscores
+      .substring(0, 150);                       // Limit length for Windows path limits
   }
 
   private ensureOutputDir(outputDir: string): void {
