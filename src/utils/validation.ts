@@ -8,8 +8,13 @@ export class ValidationError extends Error {
 export function validateYouTubeUrl(url: string): boolean {
   try {
     const urlObj = new URL(url);
-    const validHosts = ['www.youtube.com', 'youtube.com', 'youtu.be', 'm.youtube.com'];
-    
+    const validHosts = [
+      'www.youtube.com',
+      'youtube.com',
+      'youtu.be',
+      'm.youtube.com',
+    ];
+
     if (!validHosts.includes(urlObj.hostname)) {
       return false;
     }
@@ -36,11 +41,14 @@ export function validateFormat(format: string): boolean {
   return validFormats.includes(format.toLowerCase());
 }
 
-export function validateBatchFile(urls: string[]): { valid: string[]; invalid: string[] } {
+export function validateBatchFile(urls: string[]): {
+  valid: string[];
+  invalid: string[];
+} {
   const valid: string[] = [];
   const invalid: string[] = [];
 
-  urls.forEach(url => {
+  urls.forEach((url) => {
     if (validateYouTubeUrl(url)) {
       valid.push(url);
     } else {
