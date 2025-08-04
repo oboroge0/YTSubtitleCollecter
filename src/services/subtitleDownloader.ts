@@ -76,15 +76,16 @@ export class SubtitleDownloader {
     return subtitlePath;
   }
 
-  private async convertSrtToTxt(srtPath: string): Promise<string> {
+  private async convertSrtToTxt(subtitlePath: string): Promise<string> {
     const { readFileSync, writeFileSync, existsSync } = await import('fs');
 
-    const txtPath = srtPath.replace(/\.srt$/, '.txt');
+    // Handle both .srt and .vtt files
+    const txtPath = subtitlePath.replace(/\.(srt|vtt)$/, '.txt');
 
-    // Check if SRT file exists
-    if (!existsSync(srtPath)) {
+    // Check if subtitle file exists
+    if (!existsSync(subtitlePath)) {
       throw new Error(
-        `SRT file not found: ${srtPath}\n` +
+        `Subtitle file not found: ${subtitlePath}\n` +
         `This usually means:\n` +
         `1. The video has no subtitles in the requested language\n` +
         `2. yt-dlp failed to download subtitles\n` +
@@ -93,20 +94,35 @@ export class SubtitleDownloader {
     }
 
     try {
-      const srtContent = readFileSync(srtPath, 'utf-8');
-      const lines = srtContent.split('\n');
+      const content = readFileSync(subtitlePath, 'utf-8');
+      const lines = content.split('\n');
       const textLines: string[] = [];
 
-      for (const line of lines) {
-        const trimmed = line.trim();
+      // Skip VTT header if present
+      let startIndex = 0;
+      if (lines[0]?.trim() === 'WEBVTT') {
+        startIndex = 1;
+      }
+
+      for (let i = startIndex; i < lines.length; i++) {
+        const trimmed = lines[i].trim();
         if (
           trimmed &&
-          !trimmed.match(/^\d+$/) &&
-          !trimmed.match(
-            /^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}$/
-          )
+          !trimmed.match(/^\d+$/) && // Skip line numbers
+          !trimmed.match(/^\d{2}:\d{2}:\d{2}[.,]\d{3} --> \d{2}:\d{2}:\d{2}[.,]\d{3}/) && // Skip timestamps (both SRT and VTT)
+          !trimmed.startsWith('WEBVTT') && // Skip VTT header
+          !trimmed.startsWith('Kind:') && // Skip VTT metadata
+          !trimmed.startsWith('Language:') // Skip VTT metadata
         ) {
-          textLines.push(trimmed);
+          // Remove VTT timestamp tags like <00:00:00.000> and <c> tags
+          const cleanedLine = trimmed
+            .replace(/<\d{2}:\d{2}:\d{2}\.\d{3}>/g, '') // Remove timestamps
+            .replace(/<\/?c>/g, '') // Remove <c> and </c> tags
+            .trim();
+          
+          if (cleanedLine) {
+            textLines.push(cleanedLine);
+          }
         }
       }
 
