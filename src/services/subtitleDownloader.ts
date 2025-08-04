@@ -77,9 +77,20 @@ export class SubtitleDownloader {
   }
 
   private async convertSrtToTxt(srtPath: string): Promise<string> {
-    const { readFileSync, writeFileSync } = await import('fs');
+    const { readFileSync, writeFileSync, existsSync } = await import('fs');
 
     const txtPath = srtPath.replace(/\.srt$/, '.txt');
+
+    // Check if SRT file exists
+    if (!existsSync(srtPath)) {
+      throw new Error(
+        `SRT file not found: ${srtPath}\n` +
+        `This usually means:\n` +
+        `1. The video has no subtitles in the requested language\n` +
+        `2. yt-dlp failed to download subtitles\n` +
+        `3. Try using --auto flag for auto-generated subtitles`
+      );
+    }
 
     try {
       const srtContent = readFileSync(srtPath, 'utf-8');

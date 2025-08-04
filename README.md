@@ -51,11 +51,16 @@ npm link
 
 ### 基本的な使用方法
 
-```bash
-# 英語字幕をテキストファイルとしてダウンロード
-yt-subtitle download "https://www.youtube.com/watch?v=VIDEO_ID"
+**重要**: 多くのYouTube動画は手動字幕ではなく自動生成字幕を使用しています。自動生成字幕をダウンロードするには `-a` または `--auto` フラグを使用してください。
 
-# 日本語字幕をダウンロード
+```bash
+# 英語の自動生成字幕をダウンロード（推奨）
+yt-subtitle download "https://www.youtube.com/watch?v=VIDEO_ID" -a
+
+# 日本語の自動生成字幕をダウンロード（推奨）
+yt-subtitle download "https://www.youtube.com/watch?v=VIDEO_ID" -l ja -a
+
+# 手動字幕のみを試す（多くの場合失敗します）
 yt-subtitle download "https://www.youtube.com/watch?v=VIDEO_ID" -l ja
 
 # SRT形式でダウンロード
