@@ -4,7 +4,10 @@ dist/
 .DS_Store
 .env
 downloads/
+
+# Subtitle files
 *.txt
 *.srt
 *.vtt
-*.json
+# Only ignore JSON files in downloads directory
+downloads/*.json
